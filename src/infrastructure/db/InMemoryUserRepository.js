@@ -4,15 +4,16 @@ const User = require("../../domain/entities/User");
 const IUserRepository = require("../../application/repository_interfaces/IUserRepository");
 
 class InMemoryUserRepository extends IUserRepository {
-    constructor() {
+    constructor(hashingService) {
         super(); // calls the constructor of the parent class (IUserRepository)
         this.users = []; // array to store users
+        this.hashingService = hashingService;
     }
 
     async save(user) {
 
         // Add bcrypt hashing
-        const hashedPassword = await bcrypt.hash(user.password, 10);
+        const hashedPassword = await this.hashingService.hashPassword(user.password);
 
         // Create a new User object
         const userObj = new User(user.username, hashedPassword, user.email);
